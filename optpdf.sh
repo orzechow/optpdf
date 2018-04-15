@@ -2,13 +2,15 @@
 #
 # optpdf file.pdf
 #   This script will attempt to optimize the given pdf
+#
 
 file="$1"
-filebase="$(basename "$file" .pdf)"
-optfile="/tmp/$$-${filebase}_opt.pdf"
-gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
-        -sOutputFile="${optfile}" "${file}"
+filebase=$(basename "$file" .pdf)
+optfile=/tmp/$$-${filebase}_opt.pdf
+echo "$1"
 
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH \
+        -sOutputFile="${optfile}" "${file}"
 if [ $? == '0' ]; then
     optsize=$(stat -c "%s" "${optfile}")
     orgsize=$(stat -c "%s" "${file}")
@@ -17,14 +19,14 @@ if [ $? == '0' ]; then
         rm -f "${optfile}"
         exit;
     fi
-    if [ ${optsize} -ge ${orgsize} ]; then
+    if [ "${optsize}" -ge "${orgsize}" ]; then
         echo "Didn't make it smaller! Keeping original"
         rm -f "${optfile}"
         exit;
     fi
-    bytesSaved=$(expr $orgsize - $optsize)
-    percent=$(expr $optsize '*' 100 / $orgsize)
-    echo Saving $bytesSaved bytes \(now ${percent}% of old\)
+    bytesSaved=$((orgsize - optsize))
+    percent=$((optsize * 100 / orgsize))
+    echo Saving "$bytesSaved" bytes \(now "${percent}"% of old\)
     rm "${file}"
     mv "${optfile}" "${file}"
 fi
