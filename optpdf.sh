@@ -3,7 +3,7 @@
 # optpdf file.pdf
 #   This script will attempt to optimize the given pdf
 #
-
+# See also https://tbrink.science/blog/2018/05/13/lossy-compression-for-pdfs
 
 for i in "$@"
 do
