@@ -11,9 +11,10 @@ do
   file="$i"
   filebase=$(basename "$file" .pdf)
   optfile=/tmp/$$-${filebase}_opt.pdf
-  echo "$i"
-
-  if gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/printer -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${optfile}" "${file}"; then
+#  pdfsetting="printer"
+  pdfsetting="ebook"
+  echo "optimizing $i for $pdfsetting"
+  if gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/${pdfsetting} -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${optfile}" "${file}"; then
     optsize=$(stat -c "%s" "${optfile}")
     orgsize=$(stat -c "%s" "${file}")
     if [ "${optsize}" -eq 0 ]; then
