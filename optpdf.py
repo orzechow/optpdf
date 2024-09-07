@@ -10,12 +10,11 @@
 import os
 import subprocess
 import sys
+import argparse
 
-def optimize_pdf(file):
+def optimize_pdf(file, pdfsetting):
   filebase = os.path.splitext(os.path.basename(file))[0]
   optfile = f"/tmp/{os.getpid()}-{filebase}_opt.pdf"
-  pdfsetting = "ebook"
-  # pdfsetting="printer"
   print(f"Optimizing {file} for {pdfsetting}")
   try:
     subprocess.run(["gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", f"-dPDFSETTINGS=/{pdfsetting}", "-dNOPAUSE", "-dQUIET", "-dBATCH", f"-sOutputFile={optfile}", file], check=True)
@@ -38,5 +37,10 @@ def optimize_pdf(file):
     print(f"Error optimizing {file}: {e}")
 
 if __name__ == "__main__":
-  for file in sys.argv[1:]:
-    optimize_pdf(file)
+  parser = argparse.ArgumentParser(description="This script will attempt to optimize the given pdf")
+  parser.add_argument("files", nargs="+", help="PDF files to optimize")
+  parser.add_argument("-q", "--quality", default="ebook", choices=["screen", "ebook", "printer"], help="PDF optimization setting (default: ebook)")
+  args = parser.parse_args()
+
+  for file in args.files:
+    optimize_pdf(file, args.quality)
